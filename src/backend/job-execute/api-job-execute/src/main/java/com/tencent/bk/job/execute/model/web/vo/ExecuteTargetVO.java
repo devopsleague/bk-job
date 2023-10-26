@@ -24,39 +24,22 @@
 
 package com.tencent.bk.job.execute.model.web.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-@ApiModel("步骤源文件信息")
-public class ExecuteFileSourceInfoVO {
+@ApiModel("执行目标信息")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ExecuteTargetVO {
 
-    @ApiModelProperty(value = "文件类型 1-服务器文件 2-本地文件 3-文件源文件")
-    private Integer fileType;
+    @ApiModelProperty(value = "全局变量名")
+    private String variable;
 
-    @ApiModelProperty("文件路径")
-    private List<String> fileLocation;
+    @ApiModelProperty(value = "主机节点列表")
+    @JsonProperty("hostNodeInfo")
+    private ExecuteServersVO hostNodeInfo;
 
-    @ApiModelProperty(value = "文件 Hash 值 仅本地文件有")
-    private String fileHash;
-
-    @ApiModelProperty(value = "文件大小 仅本地文件有")
-    private String fileSize;
-
-    @ApiModelProperty(value = "主机列表")
-    private ExecuteTargetVO host;
-
-    @ApiModelProperty(value = "主机账号")
-    @JsonProperty("account")
-    private Long accountId;
-
-    @ApiModelProperty(value = "主机账号名称")
-    private String accountName;
-
-    @ApiModelProperty(value = "文件源ID")
-    private Integer fileSourceId;
 }

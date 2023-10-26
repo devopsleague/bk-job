@@ -24,39 +24,18 @@
 
 package com.tencent.bk.job.execute.model.web.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-@ApiModel("步骤源文件信息")
-public class ExecuteFileSourceInfoVO {
+@ApiModel("目标拓扑节点信息")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ExecuteTopoNodeVO {
+    @ApiModelProperty(value = "节点 ID，对应拓扑树节点中的instanceId", required = true)
+    private Long instanceId;
 
-    @ApiModelProperty(value = "文件类型 1-服务器文件 2-本地文件 3-文件源文件")
-    private Integer fileType;
-
-    @ApiModelProperty("文件路径")
-    private List<String> fileLocation;
-
-    @ApiModelProperty(value = "文件 Hash 值 仅本地文件有")
-    private String fileHash;
-
-    @ApiModelProperty(value = "文件大小 仅本地文件有")
-    private String fileSize;
-
-    @ApiModelProperty(value = "主机列表")
-    private ExecuteTargetVO host;
-
-    @ApiModelProperty(value = "主机账号")
-    @JsonProperty("account")
-    private Long accountId;
-
-    @ApiModelProperty(value = "主机账号名称")
-    private String accountName;
-
-    @ApiModelProperty(value = "文件源ID")
-    private Integer fileSourceId;
+    @ApiModelProperty(value = "节点类型 biz-业务 set-集群 module-模块 xxx-用户自定义节点类型，对应拓扑树节点中的objectId", required = true)
+    private String objectId;
 }

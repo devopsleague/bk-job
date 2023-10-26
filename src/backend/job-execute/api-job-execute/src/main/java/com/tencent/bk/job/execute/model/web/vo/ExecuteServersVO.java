@@ -24,39 +24,52 @@
 
 package com.tencent.bk.job.execute.model.web.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.tencent.bk.job.common.model.vo.DynamicGroupIdWithMeta;
+import com.tencent.bk.job.common.util.json.JsonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
-@ApiModel("步骤源文件信息")
-public class ExecuteFileSourceInfoVO {
+@ApiModel("目标服务器信息")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ExecuteServersVO {
 
-    @ApiModelProperty(value = "文件类型 1-服务器文件 2-本地文件 3-文件源文件")
-    private Integer fileType;
+    @ApiModelProperty("静态 IP 列表")
+    @JsonProperty("hostList")
+    private List<ExecuteHostVO> hostList;
 
-    @ApiModelProperty("文件路径")
-    private List<String> fileLocation;
+    @ApiModelProperty("拓扑节点")
+    @JsonProperty("nodeList")
+    private List<ExecuteTopoNodeVO> nodeList;
 
-    @ApiModelProperty(value = "文件 Hash 值 仅本地文件有")
-    private String fileHash;
+    @ApiModelProperty("动态分组 ID")
+    @JsonProperty("dynamicGroupList")
+    private List<DynamicGroupIdWithMeta> dynamicGroupList;
 
-    @ApiModelProperty(value = "文件大小 仅本地文件有")
-    private String fileSize;
-
-    @ApiModelProperty(value = "主机列表")
-    private ExecuteTargetVO host;
-
-    @ApiModelProperty(value = "主机账号")
-    @JsonProperty("account")
-    private Long accountId;
-
-    @ApiModelProperty(value = "主机账号名称")
-    private String accountName;
-
-    @ApiModelProperty(value = "文件源ID")
-    private Integer fileSourceId;
+    @JsonIgnore
+    public List<String> getDynamicGroupIdList() {
+        if (CollectionUtils.isEmpty(dynamicGroupList)) {
+            return Collections.emptyList();
+        }
+        List<String> dynamicGroupIdList = new ArrayList<>();
+        for (DynamicGroupIdWithMeta dynamicGroup : dynamicGroupList) {
+            DynamicGroupIdWithMeta dynamicGroupIdWithMeta = JsonUtils.fromJson(
+                JsonUtils.toJson(dynamicGroup),
+                new TypeReference<DynamicGroupIdWithMeta>() {
+                }
+            );
+            dynamicGroupIdList.add(dynamicGroupIdWithMeta.getId());
+        }
+        return dynamicGroupIdList;
+    }
 }

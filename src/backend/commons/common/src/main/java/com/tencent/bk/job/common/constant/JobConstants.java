@@ -96,8 +96,4 @@ public class JobConstants {
      * Job内置业务集的ID范围的最大值
      */
     public static final long JOB_BUILD_IN_BIZ_SET_ID_MAX = 9999999L;
-    /**
-     * 未知的资源名称
-     */
-    public static final String UNKNOWN_NAME = "Unknown";
 }

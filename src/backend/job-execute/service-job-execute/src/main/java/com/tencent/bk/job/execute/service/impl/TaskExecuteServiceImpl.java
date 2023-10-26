@@ -1175,7 +1175,12 @@ public class TaskExecuteServiceImpl implements TaskExecuteService {
                 } else {
                     hostDetail = hostMap.get("hostIp:" + host.toCloudIp());
                 }
-                host.updateByHost(hostDetail);
+                host.setHostId(hostDetail.getHostId());
+                host.setAgentId(hostDetail.getAgentId());
+                host.setBkCloudId(hostDetail.getBkCloudId());
+                host.setIp(hostDetail.getIp());
+                host.setIpv6(hostDetail.getIpv6());
+                host.setBkCloudName(hostDetail.getBkCloudName());
             });
         }
     }

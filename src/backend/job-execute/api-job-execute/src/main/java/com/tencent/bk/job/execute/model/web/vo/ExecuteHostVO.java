@@ -24,39 +24,32 @@
 
 package com.tencent.bk.job.execute.model.web.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@ApiModel("主机信息")
 @Data
-@ApiModel("步骤源文件信息")
-public class ExecuteFileSourceInfoVO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ExecuteHostVO {
+    @ApiModelProperty("主机ID")
+    private Long hostId;
 
-    @ApiModelProperty(value = "文件类型 1-服务器文件 2-本地文件 3-文件源文件")
-    private Integer fileType;
+    @ApiModelProperty("主机 IP")
+    private String ip;
 
-    @ApiModelProperty("文件路径")
-    private List<String> fileLocation;
+    @ApiModelProperty("主机 IPv6")
+    private String ipv6;
 
-    @ApiModelProperty(value = "文件 Hash 值 仅本地文件有")
-    private String fileHash;
+    @ApiModelProperty("agent 状态 0-异常 1-正常")
+    private Integer alive;
 
-    @ApiModelProperty(value = "文件大小 仅本地文件有")
-    private String fileSize;
+    @ApiModelProperty("云区域ID")
+    private Long cloudId;
 
-    @ApiModelProperty(value = "主机列表")
-    private ExecuteTargetVO host;
-
-    @ApiModelProperty(value = "主机账号")
-    @JsonProperty("account")
-    private Long accountId;
-
-    @ApiModelProperty(value = "主机账号名称")
-    private String accountName;
-
-    @ApiModelProperty(value = "文件源ID")
-    private Integer fileSourceId;
 }

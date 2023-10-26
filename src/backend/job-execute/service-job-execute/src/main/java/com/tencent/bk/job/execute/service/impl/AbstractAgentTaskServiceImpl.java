@@ -1,12 +1,12 @@
 package com.tencent.bk.job.execute.service.impl;
 
-import com.tencent.bk.job.common.cc.sdk.BkNetClient;
 import com.tencent.bk.job.common.model.dto.HostDTO;
 import com.tencent.bk.job.execute.model.AgentTaskDTO;
 import com.tencent.bk.job.execute.model.AgentTaskDetailDTO;
 import com.tencent.bk.job.execute.model.AgentTaskResultGroupDTO;
 import com.tencent.bk.job.execute.model.StepInstanceBaseDTO;
 import com.tencent.bk.job.execute.service.AgentTaskService;
+import com.tencent.bk.job.execute.service.HostService;
 import com.tencent.bk.job.execute.service.StepInstanceService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +24,12 @@ import java.util.stream.Collectors;
 public abstract class AbstractAgentTaskServiceImpl implements AgentTaskService {
     private final StepInstanceService stepInstanceService;
 
-    public AbstractAgentTaskServiceImpl(StepInstanceService stepInstanceService) {
+    private final HostService hostService;
+
+    public AbstractAgentTaskServiceImpl(StepInstanceService stepInstanceService,
+                                        HostService hostService) {
         this.stepInstanceService = stepInstanceService;
+        this.hostService = hostService;
     }
 
     protected final List<AgentTaskDetailDTO> fillHostDetail(StepInstanceBaseDTO stepInstance,
@@ -36,8 +41,10 @@ public abstract class AbstractAgentTaskServiceImpl implements AgentTaskService {
         List<AgentTaskDetailDTO> agentTaskDetailList;
         boolean hasIpInfo = agentTasks.stream().anyMatch(agentTask -> StringUtils.isNotEmpty(agentTask.getCloudIp()));
         if (!hasIpInfo) {
-            // 从当前版本开始AgentTask不会包含主机详细信息（ip\云区域等），需要从StepInstance反查
+            // 从当前版本开始AgentTask不会包含ip信息，需要从StepInstance反查
             Map<Long, HostDTO> hosts = stepInstanceService.computeStepHosts(stepInstance, HostDTO::getHostId);
+            Set<Long> bkCloudIds = hosts.values().stream().map(HostDTO::getBkCloudId).collect(Collectors.toSet());
+            Map<Long, String> cloudAreaNames = hostService.batchGetCloudAreaNames(bkCloudIds);
             agentTaskDetailList = agentTasks
                 .stream()
                 .map(agentTask -> {
@@ -47,7 +54,7 @@ public abstract class AbstractAgentTaskServiceImpl implements AgentTaskService {
                     agentTaskDetail.setBkCloudId(host.getBkCloudId());
                     agentTaskDetail.setIp(host.getIp());
                     agentTaskDetail.setIpv6(host.getIpv6());
-                    agentTaskDetail.setBkCloudName(BkNetClient.getCloudAreaNameFromCache(host.getBkCloudId()));
+                    agentTaskDetail.setBkCloudName(cloudAreaNames.get(host.getBkCloudId()));
                     return agentTaskDetail;
                 }).collect(Collectors.toList());
         } else {
@@ -56,9 +63,13 @@ public abstract class AbstractAgentTaskServiceImpl implements AgentTaskService {
                 .stream()
                 .map(AgentTaskDetailDTO::new)
                 .collect(Collectors.toList());
+            Set<Long> bkCloudIds = agentTaskDetailList
+                .stream()
+                .map(AgentTaskDetailDTO::getBkCloudId)
+                .collect(Collectors.toSet());
+            Map<Long, String> cloudAreaNames = hostService.batchGetCloudAreaNames(bkCloudIds);
             agentTaskDetailList.forEach(
-                agentTaskDetail -> agentTaskDetail.setBkCloudName(
-                    BkNetClient.getCloudAreaNameFromCache(agentTaskDetail.getBkCloudId())));
+                agentTaskDetail -> agentTaskDetail.setBkCloudName(cloudAreaNames.get(agentTaskDetail.getBkCloudId())));
         }
         return agentTaskDetailList;
     }

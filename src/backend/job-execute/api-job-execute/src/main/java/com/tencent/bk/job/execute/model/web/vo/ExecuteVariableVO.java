@@ -24,7 +24,6 @@
 
 package com.tencent.bk.job.execute.model.web.vo;
 
-import com.tencent.bk.job.common.model.vo.TaskTargetVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -46,7 +45,7 @@ public class ExecuteVariableVO {
     private String value;
 
     @ApiModelProperty(value = "主机变量值，当变量类型为主机列表的时有效")
-    private TaskTargetVO targetValue;
+    private ExecuteTargetVO targetValue;
 
     @ApiModelProperty(value = "赋值可变 0-不可变 1-可变")
     private Integer changeable;

@@ -25,10 +25,8 @@
 package com.tencent.bk.job.manage.service.host.impl;
 
 import com.tencent.bk.job.common.cc.sdk.BkNetClient;
-import com.tencent.bk.job.common.constant.JobConstants;
 import com.tencent.bk.job.common.model.dto.AppResourceScope;
 import com.tencent.bk.job.common.model.dto.ApplicationHostDTO;
-import com.tencent.bk.job.common.model.dto.HostDTO;
 import com.tencent.bk.job.manage.service.host.HostDetailService;
 import com.tencent.bk.job.manage.service.host.WhiteIpAwareScopeHostService;
 import com.tencent.bk.job.manage.service.impl.agent.AgentStatusService;
@@ -68,33 +66,26 @@ public class HostDetailServiceImpl implements HostDetailService {
         );
         // 填充实时agent状态
         agentStatusService.fillRealTimeAgentStatus(scopeHostList);
-        fillDetailForApplicationHosts(scopeHostList);
+        fillDetailForHosts(scopeHostList);
         return scopeHostList;
     }
 
     @Override
-    public void fillDetailForApplicationHosts(List<ApplicationHostDTO> hostList) {
+    public void fillDetailForHosts(List<ApplicationHostDTO> hostList) {
         for (ApplicationHostDTO host : hostList) {
             host.setCloudAreaName(BkNetClient.getCloudAreaNameFromCache(host.getCloudAreaId()));
             String cloudVendorId = host.getCloudVendorId();
             host.setCloudVendorName(cloudVendorService.getCloudVendorNameOrDefault(
-                cloudVendorId, cloudVendorId == null ? null : JobConstants.UNKNOWN_NAME));
+                cloudVendorId,
+                cloudVendorId == null ? null : "ID=" + cloudVendorId
+                )
+            );
             String osTypeId = host.getOsType();
-            host.setOsTypeName(osTypeService.getOsTypeNameOrDefault(osTypeId,
-                osTypeId == null ? null : JobConstants.UNKNOWN_NAME));
-        }
-    }
-
-    @Override
-    public void fillDetailForHosts(List<HostDTO> hostList) {
-        for (HostDTO host : hostList) {
-            host.setBkCloudName(BkNetClient.getCloudAreaNameFromCache(host.getBkCloudId()));
-            String cloudVendorId = host.getCloudVendorId();
-            host.setCloudVendorName(cloudVendorService.getCloudVendorNameOrDefault(
-                cloudVendorId, cloudVendorId == null ? null : JobConstants.UNKNOWN_NAME));
-            String osTypeId = host.getOsType();
-            host.setOsTypeName(osTypeService.getOsTypeNameOrDefault(osTypeId,
-                osTypeId == null ? null : JobConstants.UNKNOWN_NAME));
+            host.setOsTypeName(osTypeService.getOsTypeNameOrDefault(
+                osTypeId,
+                osTypeId == null ? null : "ID=" + osTypeId
+                )
+            );
         }
     }
 }

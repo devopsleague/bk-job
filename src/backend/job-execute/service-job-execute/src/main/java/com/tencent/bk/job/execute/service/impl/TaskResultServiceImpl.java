@@ -24,7 +24,6 @@
 
 package com.tencent.bk.job.execute.service.impl;
 
-import com.tencent.bk.job.common.cc.sdk.BkNetClient;
 import com.tencent.bk.job.common.constant.ErrorCode;
 import com.tencent.bk.job.common.constant.Order;
 import com.tencent.bk.job.common.exception.FailedPreconditionException;
@@ -412,8 +411,10 @@ public class TaskResultServiceImpl implements TaskResultService {
         }
         // 批量添加云区域名称
         if (CollectionUtils.isNotEmpty(agentTasks)) {
-            agentTasks.forEach(agentTask -> agentTask.setBkCloudName(
-                BkNetClient.getCloudAreaNameFromCache(agentTask.getBkCloudId())));
+            Set<Long> bkCloudIds = agentTasks.stream().map(AgentTaskDetailDTO::getBkCloudId)
+                .collect(Collectors.toSet());
+            Map<Long, String> cloudAreaNames = hostService.batchGetCloudAreaNames(bkCloudIds);
+            agentTasks.forEach(agentTask -> agentTask.setBkCloudName(cloudAreaNames.get(agentTask.getBkCloudId())));
         }
         resultGroup.setAgentTasks(agentTasks);
         resultGroups.add(resultGroup);

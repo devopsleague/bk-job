@@ -74,7 +74,7 @@ public class CacheHostDO {
     private Long bizId;
 
     /**
-     * 主机名称
+     * 主机描述
      */
     private String hostDesc;
 
